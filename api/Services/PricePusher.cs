@@ -73,7 +73,8 @@ public class PricePusher : BackgroundService
             }
             catch (Exception ex)
             {
-                _logger.LogWarning(ex, "[pusher] failed session {id}", s.SessionId);
+                string sid = s.SessionId.ToString();
+                _logger.LogWarning("[pusher] failed session {id}: {err}", sid, ex.Message);
             }
         }
         _logger.LogInformation("[pusher] pushed to {n}/{total} sessions", pushed, sessions.Count);

@@ -28,7 +28,7 @@ func main() {
 
 	// Retry loop: wait for Postgres to be ready (useful in docker-compose startup)
 	for i := 0; i < 15; i++ {
-		st, err = store.New(ctx, dsn)
+		st, err = store.New(dsn)
 		if err == nil {
 			break
 		}
