@@ -1,0 +1,69 @@
+# =========================
+# MawaqitduGazole .gitignore
+# =========================
+
+# ----- Secrets & Config -----
+.env
+.env.*
+*.env
+appsettings.Production.json
+appsettings.Local.json
+secrets.json
+*.pem
+*.key
+*.cert
+*.p12
+*.pfx
+
+# ----- Claude / AI tools -----
+.claude/
+.cursor/
+.aider*
+*.claude
+
+# ----- Go -----
+vendor/
+*.exe
+*.test
+*.out
+ingestion/bin/
+ingestion/tmp/
+
+# ----- .NET / C# -----
+bin/
+obj/
+*.user
+*.suo
+*.vs/
+.vs/
+*.nupkg
+*.snupkg
+TestResults/
+publish/
+api/bin/
+api/obj/
+
+# ----- Node (if added later) -----
+node_modules/
+dist/
+.next/
+.nuxt/
+
+# ----- Docker -----
+docker-compose.override.yml
+
+# ----- Database -----
+*.sql.bak
+pgdata/
+
+# ----- OS -----
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# ----- IDE -----
+.idea/
+*.swp
+*.swo
+.vscode/settings.json
+.vscode/launch.json

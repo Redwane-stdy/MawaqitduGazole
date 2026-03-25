@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>MawaqitduGazole</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <!-- ═══════════════════════════════════════════════════
+       SETUP SCREEN (shown on first visit)
+  ══════════════════════════════════════════════════════ -->
+  <div id="setup-screen" class="screen">
+    <div class="logo">
+      <span class="logo-icon">⛽</span>
+      <h1>MawaqitduGazole</h1>
+      <p class="tagline">Le prix le moins cher, maintenant.</p>
+    </div>
+
+    <form id="setup-form" class="setup-card">
+      <div class="field">
+        <label>Mon carburant</label>
+        <div class="fuel-grid">
+          <button type="button" class="fuel-btn" data-fuel="Gazole">Diesel</button>
+          <button type="button" class="fuel-btn" data-fuel="SP95">SP95</button>
+          <button type="button" class="fuel-btn" data-fuel="SP98">SP98</button>
+          <button type="button" class="fuel-btn" data-fuel="E10">E10</button>
+          <button type="button" class="fuel-btn" data-fuel="E85">E85</button>
+          <button type="button" class="fuel-btn" data-fuel="GPLc">GPL</button>
+        </div>
+      </div>
+
+      <div class="field">
+        <label>Ma position</label>
+        <button type="button" id="geolocate-btn" class="geo-btn">
+          📍 Utiliser ma position GPS
+        </button>
+        <div id="geo-status" class="geo-status"></div>
+      </div>
+
+      <div class="field">
+        <label>Rayon de recherche</label>
+        <div class="radius-row">
+          <input type="range" id="radius-input" min="1" max="30" value="5" />
+          <span id="radius-label">5 km</span>
+        </div>
+      </div>
+
+      <button type="submit" id="start-btn" class="start-btn" disabled>
+        Afficher le prix →
+      </button>
+    </form>
+  </div>
+
+  <!-- ═══════════════════════════════════════════════════
+       WIDGET SCREEN (shown after setup)
+  ══════════════════════════════════════════════════════ -->
+  <div id="widget-screen" class="screen hidden">
+    <header class="widget-header">
+      <span class="logo-sm">⛽ MawaqitduGazole</span>
+      <button id="reset-btn" class="reset-btn" title="Changer mes préférences">✎</button>
+    </header>
+
+    <div class="widget-body">
+      <div id="loading-state" class="state">
+        <div class="spinner"></div>
+        <p>Recherche en cours…</p>
+      </div>
+
+      <div id="result-state" class="state hidden">
+        <div class="price-badge">
+          <span id="price-value" class="price-value">—</span>
+          <span class="price-unit">€/L</span>
+        </div>
+        <div class="station-info">
+          <p id="station-name" class="station-name"></p>
+          <p id="station-dist" class="station-dist"></p>
+        </div>
+        <div class="fuel-tag-row">
+          <span id="fuel-tag" class="fuel-tag"></span>
+        </div>
+      </div>
+
+      <div id="no-result-state" class="state hidden">
+        <p class="no-result">Aucune station trouvée dans ce rayon.</p>
+        <button id="expand-btn" class="expand-btn">Agrandir le rayon</button>
+      </div>
+    </div>
+
+    <footer class="widget-footer">
+      <span id="last-update" class="last-update">Mise à jour…</span>
+      <span class="dot">·</span>
+      <span id="db-count" class="db-count"></span>
+    </footer>
+
+    <!-- Top 5 panel -->
+    <div class="top5-panel">
+      <h3>5 stations les moins chères</h3>
+      <table id="top5-table">
+        <thead>
+          <tr><th>Station</th><th>Distance</th><th>Prix</th></tr>
+        </thead>
+        <tbody id="top5-body"></tbody>
+      </table>
+    </div>
+  </div>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/microsoft-signalr/8.0.0/signalr.min.js"
+          integrity="sha512-3zf8MdEZUh+yP0BuXAhN6U7ZrmG5OuKqd3ME6rWPd1TqGJfQcSFCFN+AqnfZsFVvsb4j4b+FOPJ6HEOxBGkQ=="
+          crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+  <script src="app.js"></script>
+</body>
+</html>

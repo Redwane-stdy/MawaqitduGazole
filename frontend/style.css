@@ -1,0 +1,281 @@
+/* ════════════════════════════════════════════════════════════
+   MawaqitduGazole — Minimalist widget
+   Inspired by Mawaqit: bold numbers, dark background, clean
+════════════════════════════════════════════════════════════ */
+
+:root {
+  --bg:        #0d1117;
+  --surface:   #161b22;
+  --surface2:  #21262d;
+  --border:    #30363d;
+  --accent:    #f0a500;
+  --accent-dim:#f0a50033;
+  --text:      #e6edf3;
+  --text-dim:  #8b949e;
+  --green:     #3fb950;
+  --red:       #f85149;
+  --radius:    14px;
+  --font:      'Segoe UI', system-ui, sans-serif;
+}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--font);
+  min-height: 100dvh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 1.5rem;
+}
+
+/* ─── Screens ──────────────────────────────────────────────── */
+.screen { width: 100%; max-width: 460px; }
+.hidden { display: none !important; }
+
+/* ─── Setup screen ─────────────────────────────────────────── */
+.logo {
+  text-align: center;
+  margin-bottom: 2rem;
+}
+.logo-icon { font-size: 3rem; display: block; margin-bottom: .5rem; }
+.logo h1   { font-size: 1.7rem; font-weight: 700; letter-spacing: .5px; }
+.tagline   { color: var(--text-dim); margin-top: .3rem; font-size: .95rem; }
+
+.setup-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 1.8rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1.6rem;
+}
+
+.field label {
+  display: block;
+  font-size: .75rem;
+  font-weight: 600;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  color: var(--text-dim);
+  margin-bottom: .75rem;
+}
+
+/* Fuel selector */
+.fuel-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: .5rem;
+}
+.fuel-btn {
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  color: var(--text);
+  border-radius: 8px;
+  padding: .6rem .3rem;
+  font-size: .9rem;
+  cursor: pointer;
+  transition: all .15s;
+}
+.fuel-btn:hover   { border-color: var(--accent); }
+.fuel-btn.selected {
+  background: var(--accent-dim);
+  border-color: var(--accent);
+  color: var(--accent);
+  font-weight: 700;
+}
+
+/* Geolocation button */
+.geo-btn {
+  width: 100%;
+  background: var(--surface2);
+  border: 1px dashed var(--border);
+  color: var(--text);
+  border-radius: 8px;
+  padding: .75rem 1rem;
+  font-size: .95rem;
+  cursor: pointer;
+  transition: border-color .15s;
+}
+.geo-btn:hover { border-color: var(--accent); }
+.geo-status    { font-size: .82rem; color: var(--green); margin-top: .5rem; min-height: 1.1em; }
+
+/* Radius slider */
+.radius-row {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+input[type=range] {
+  flex: 1;
+  accent-color: var(--accent);
+  cursor: pointer;
+}
+#radius-label {
+  font-weight: 700;
+  color: var(--accent);
+  min-width: 3rem;
+  text-align: right;
+}
+
+/* Start button */
+.start-btn {
+  background: var(--accent);
+  color: #000;
+  border: none;
+  border-radius: var(--radius);
+  padding: .9rem;
+  font-size: 1rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: opacity .15s;
+}
+.start-btn:disabled { opacity: .35; cursor: not-allowed; }
+.start-btn:not(:disabled):hover { opacity: .85; }
+
+/* ─── Widget screen ─────────────────────────────────────────── */
+.widget-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 1.5rem;
+}
+.logo-sm   { font-size: 1rem; font-weight: 700; color: var(--text-dim); }
+.reset-btn {
+  background: none;
+  border: 1px solid var(--border);
+  color: var(--text-dim);
+  border-radius: 8px;
+  padding: .3rem .7rem;
+  cursor: pointer;
+  font-size: .85rem;
+}
+.reset-btn:hover { color: var(--text); border-color: var(--accent); }
+
+.widget-body {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 2.5rem 2rem;
+  text-align: center;
+  min-height: 220px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+
+/* States */
+.state { width: 100%; }
+
+/* Spinner */
+.spinner {
+  width: 36px; height: 36px;
+  border: 3px solid var(--border);
+  border-top-color: var(--accent);
+  border-radius: 50%;
+  animation: spin .8s linear infinite;
+  margin: 0 auto 1rem;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+
+/* Price display — Mawaqit-style big number */
+.price-badge {
+  display: flex;
+  align-items: baseline;
+  justify-content: center;
+  gap: .4rem;
+  margin-bottom: 1.2rem;
+}
+.price-value {
+  font-size: 4.5rem;
+  font-weight: 900;
+  color: var(--accent);
+  line-height: 1;
+  letter-spacing: -2px;
+  font-variant-numeric: tabular-nums;
+}
+.price-unit { font-size: 1.4rem; color: var(--text-dim); font-weight: 600; }
+
+.station-name {
+  font-size: 1.05rem;
+  font-weight: 600;
+  margin-bottom: .25rem;
+}
+.station-dist { font-size: .85rem; color: var(--text-dim); }
+
+.fuel-tag-row { margin-top: 1rem; }
+.fuel-tag {
+  display: inline-block;
+  background: var(--accent-dim);
+  color: var(--accent);
+  border-radius: 999px;
+  padding: .25rem .8rem;
+  font-size: .8rem;
+  font-weight: 700;
+  letter-spacing: .5px;
+}
+
+.no-result { color: var(--text-dim); margin-bottom: 1rem; }
+.expand-btn {
+  background: none;
+  border: 1px solid var(--accent);
+  color: var(--accent);
+  border-radius: 8px;
+  padding: .5rem 1.2rem;
+  cursor: pointer;
+  font-size: .9rem;
+}
+
+/* Footer */
+.widget-footer {
+  display: flex;
+  gap: .5rem;
+  justify-content: center;
+  margin-top: .9rem;
+  font-size: .78rem;
+  color: var(--text-dim);
+}
+
+/* Top 5 panel */
+.top5-panel {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 1.2rem 1.5rem;
+  margin-top: 1.2rem;
+}
+.top5-panel h3 {
+  font-size: .75rem;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  color: var(--text-dim);
+  margin-bottom: .9rem;
+}
+#top5-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: .88rem;
+}
+#top5-table th {
+  text-align: left;
+  color: var(--text-dim);
+  font-weight: 500;
+  padding-bottom: .5rem;
+  border-bottom: 1px solid var(--border);
+}
+#top5-table td {
+  padding: .55rem 0;
+  border-bottom: 1px solid var(--border);
+  vertical-align: middle;
+}
+#top5-table tr:last-child td { border-bottom: none; }
+#top5-table td:last-child { font-weight: 700; color: var(--accent); text-align: right; }
+#top5-table td:nth-child(2) { color: var(--text-dim); font-size: .82rem; }
+#top5-table tr:first-child td:first-child::before {
+  content: "★ ";
+  color: var(--accent);
+}
