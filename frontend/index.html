@@ -8,20 +8,18 @@
 </head>
 <body>
 
-  <!-- ═══════════════════════════════════════════════════
-       SETUP SCREEN (shown on first visit)
-  ══════════════════════════════════════════════════════ -->
-  <div id="setup-screen" class="screen setup-layout">
+  <!-- ── SETUP (première visite) ─────────────────────────── -->
+  <div id="setup-screen" class="screen">
 
     <div class="setup-brand">
-      <span class="setup-brand__icon">⛽</span>
       <h1 class="setup-brand__name">MawaqitduGazole</h1>
       <p class="setup-brand__tagline">Le prix le moins cher, maintenant.</p>
     </div>
 
-    <form id="setup-form" class="setup-card">
+    <form id="setup-form" class="setup-form">
+
       <div class="field">
-        <label>Mon carburant</label>
+        <label class="field-label">Mon carburant</label>
         <div class="fuel-grid">
           <button type="button" class="fuel-btn" data-fuel="Gazole">Diesel</button>
           <button type="button" class="fuel-btn" data-fuel="SP95">SP95</button>
@@ -33,148 +31,121 @@
       </div>
 
       <div class="field">
-        <label>Ma position</label>
+        <label class="field-label">Ma position</label>
         <button type="button" id="geolocate-btn" class="geo-btn">
-          📍 Utiliser ma position GPS
+          Utiliser ma position GPS
         </button>
-        <div id="geo-status" class="geo-status"></div>
-        <!-- Fallback : affiché si géolocalisation refusée ou non supportée -->
+        <div id="geo-status" class="status-line"></div>
         <div id="geo-fallback" class="geo-fallback hidden">
           <div class="autocomplete-wrapper">
             <div class="geo-fallback-row">
               <input
                 type="text"
                 id="location-input"
-                class="location-input"
-                placeholder="Ville ou code postal (ex : Lyon, 69000…)"
+                class="text-input"
+                placeholder="Ville ou code postal…"
                 autocomplete="off"
               />
-              <button type="button" id="location-search-btn" class="location-search-btn">
+              <button type="button" id="location-search-btn" class="search-btn">
                 Rechercher
               </button>
             </div>
             <ul id="city-suggestions" class="city-suggestions hidden"></ul>
           </div>
-          <div id="location-status" class="geo-status"></div>
+          <div id="location-status" class="status-line"></div>
         </div>
       </div>
 
       <div class="field">
-        <label>Rayon de recherche</label>
-        <div class="radius-row">
-          <input type="range" id="radius-input" min="1" max="30" value="5" />
-          <span id="radius-label">5 km</span>
-        </div>
+        <label class="field-label">Rayon — <span id="radius-label">5 km</span></label>
+        <input type="range" id="radius-input" min="1" max="30" value="5" class="radius-slider" />
       </div>
 
       <button type="submit" id="start-btn" class="start-btn" disabled>
-        Afficher le prix →
+        Afficher le prix
       </button>
+
     </form>
   </div>
 
 
-  <!-- ═══════════════════════════════════════════════════
-       WIDGET SCREEN (shown after setup) — dashboard
-  ══════════════════════════════════════════════════════ -->
-  <div id="widget-screen" class="screen hidden dashboard-layout">
+  <!-- ── PRICE SCREEN (après setup) ─────────────────────── -->
+  <div id="widget-screen" class="screen hidden">
 
-    <aside class="sidebar">
-      <div class="sidebar__brand">
-        <span class="sidebar__brand-icon">⛽</span>
-        <span class="sidebar__brand-name">MawaqitduGazole</span>
+    <header class="app-header">
+      <span class="app-brand">MawaqitduGazole</span>
+      <button id="reset-btn" class="header-action">Autres parametres</button>
+    </header>
+
+    <main class="price-hero">
+
+      <div id="loading-state" class="state">
+        <div class="spinner"></div>
       </div>
 
-      <div class="sidebar__hero">
-        <div id="loading-state" class="state">
-          <div class="spinner"></div>
-          <p class="spinner-label">Recherche…</p>
+      <div id="result-state" class="state hidden">
+        <div class="price-display">
+          <span id="price-value" class="price-value">—</span>
+          <span class="price-unit">€/L</span>
         </div>
-
-        <div id="result-state" class="state hidden">
-          <div class="price-badge">
-            <span id="price-value" class="price-value">—</span>
-            <span class="price-unit">€/L</span>
-          </div>
-          <span id="fuel-tag" class="fuel-tag"></span>
-          <div class="station-info">
-            <p id="station-name" class="station-name"></p>
-            <p id="station-dist" class="station-dist"></p>
-          </div>
-          <button id="maps-btn" class="maps-btn">🗺 Y aller →</button>
-        </div>
-
-        <div id="no-result-state" class="state hidden">
-          <p class="no-result">Aucune station dans ce rayon.</p>
-          <button id="expand-btn" class="expand-btn">Agrandir le rayon</button>
-        </div>
+        <p class="fuel-label" id="fuel-tag"></p>
+        <p class="station-name" id="station-name"></p>
+        <p class="station-dist" id="station-dist"></p>
+        <button id="maps-btn" class="maps-btn">Y aller</button>
       </div>
 
-      <div class="sidebar__divider"></div>
-
-      <div class="sidebar__meta">
-        <div class="meta-row">
-          <span class="meta-icon">🕐</span>
-          <span id="last-update" class="last-update">Mise à jour…</span>
-        </div>
-        <div class="meta-row">
-          <span class="meta-icon">📍</span>
-          <span id="db-count" class="db-count">—</span>
-        </div>
-      </div>
-
-      <button id="reset-btn" class="reset-btn">
-        ✎ Modifier mes préférences
-      </button>
-    </aside>
-
-    <main class="main-area">
-      <div class="topbar">
-        <h2 class="topbar__title">Les stations les moins chères</h2>
-        <span class="topbar__badge" id="topbar-fuel-badge"></span>
-      </div>
-
-      <div class="top5-panel">
-        <table id="top5-table">
-          <thead>
-            <tr>
-              <th>#</th>
-              <th>Station</th>
-              <th>Distance</th>
-              <th>Prix</th>
-            </tr>
-          </thead>
-          <tbody id="top5-body"></tbody>
-        </table>
+      <div id="no-result-state" class="state hidden">
+        <p class="no-result-msg">Aucune station dans ce rayon.</p>
+        <button id="expand-btn" class="ghost-btn">Élargir le rayon</button>
       </div>
 
     </main>
+
+    <footer class="app-footer">
+      <span id="last-update" class="footer-meta">—</span>
+      <span class="footer-sep">·</span>
+      <span id="db-count" class="footer-meta">—</span>
+      <span class="footer-sep">·</span>
+      <button id="compare-btn" class="footer-link">5 moins chères</button>
+    </footer>
+
   </div>
 
-  <!-- ═══════════════════════════════════════════════════
-       LOG PANEL (overlay, toggleable)
-  ══════════════════════════════════════════════════════ -->
+
+  <!-- ── COMPARE PANEL (bottom sheet) ────────────────────── -->
+  <div id="compare-overlay" class="compare-overlay hidden"></div>
+  <div id="compare-panel" class="compare-panel hidden">
+    <div class="compare-header">
+      <span class="compare-title">Stations proches <span id="topbar-fuel-badge" class="compare-fuel-badge"></span></span>
+      <button id="compare-close" class="compare-close">Fermer</button>
+    </div>
+    <div class="compare-body">
+      <table id="top5-table">
+        <tbody id="top5-body"></tbody>
+      </table>
+    </div>
+  </div>
+
+
+  <!-- ── LOG PANEL (développeur) ─────────────────────────── -->
   <div id="log-panel" class="log-panel hidden">
     <div class="log-panel__header">
       <div class="log-tabs">
-        <button class="log-tab active" data-tab="api">API (.NET)</button>
-        <button class="log-tab" data-tab="ingestion">Ingestion (Go)</button>
+        <button class="log-tab active" data-tab="api">API</button>
+        <button class="log-tab" data-tab="ingestion">Ingestion</button>
       </div>
       <div class="log-panel__actions">
-        <button id="log-clear-btn" class="log-action-btn" title="Effacer">✕ Effacer</button>
-        <button id="log-close-btn" class="log-action-btn log-close" title="Fermer">✕</button>
+        <button id="log-clear-btn" class="log-action-btn">Effacer</button>
+        <button id="log-close-btn" class="log-action-btn">✕</button>
       </div>
     </div>
     <div class="log-body">
-      <div id="log-pane-api"       class="log-pane active"></div>
+      <div id="log-pane-api" class="log-pane active"></div>
       <div id="log-pane-ingestion" class="log-pane hidden"></div>
     </div>
   </div>
+  <button id="log-toggle-btn" class="log-toggle-btn hidden">Logs</button>
 
-  <!-- Log toggle button (always visible in dashboard) -->
-  <button id="log-toggle-btn" class="log-toggle-btn hidden" title="Afficher / masquer les logs">
-    📋 Logs
-  </button>
 
   <script src="https://cdnjs.cloudflare.com/ajax/libs/microsoft-signalr/8.0.0/signalr.min.js"
           integrity="sha512-3zf8MdEZUh+yP0BuXAhN6U7ZrmG5OuKqd3ME6rWPd1TqGJfQcSFCFN+AqnfZsFVvsb4j4b+FOPJ6HEOxBGkQ=="

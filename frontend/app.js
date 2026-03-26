@@ -60,6 +60,24 @@ const dbCount         = document.getElementById("db-count");
 const top5Body        = document.getElementById("top5-body");
 const mapsBtn         = document.getElementById("maps-btn");
 
+// ── Compare panel ──────────────────────────────────────────
+const compareBtn     = document.getElementById("compare-btn");
+const comparePanel   = document.getElementById("compare-panel");
+const compareClose   = document.getElementById("compare-close");
+const compareOverlay = document.getElementById("compare-overlay");
+
+function openCompare()  {
+  comparePanel?.classList.remove("hidden");
+  compareOverlay?.classList.remove("hidden");
+}
+function closeCompare() {
+  comparePanel?.classList.add("hidden");
+  compareOverlay?.classList.add("hidden");
+}
+compareBtn?.addEventListener("click", openCompare);
+compareClose?.addEventListener("click", closeCompare);
+compareOverlay?.addEventListener("click", closeCompare);
+
 // ── Boot ──────────────────────────────────────────────────────
 (async () => {
   log('BOOT', `API_BASE = ${API_BASE}`);
@@ -445,7 +463,13 @@ async function refreshMeta() {
     const meta = await resp.json();
     log('FETCH', 'Meta received', meta);
     const d = new Date(meta.lastFetch);
-    lastUpdate.textContent = `Mis à jour ${formatRelative(d)}`;
+    const now = new Date();
+    const sameDay = d.toDateString() === now.toDateString();
+    const timeStr = d.toLocaleTimeString("fr-FR"); // HH:MM:SS
+    const dateStr = d.toLocaleDateString("fr-FR"); // DD/MM/YYYY
+    lastUpdate.textContent = sameDay
+      ? `Actualisé à ${timeStr}`
+      : `Actualisé le ${dateStr} à ${timeStr}`;
     dbCount.textContent = `${meta.stationCount.toLocaleString("fr-FR")} stations`;
   } catch (err) {
     log('ERROR', `refreshMeta failed: ${err.message}`);
@@ -486,6 +510,7 @@ top5Body.addEventListener("click", e => {
   top5Body.querySelectorAll("tr").forEach(r => r.classList.remove("selected"));
   row.classList.add("selected");
   renderResult(s);
+  closeCompare();
   log('FETCH', `Station sélectionnée : ${s.address}, ${s.city} — ${s.price.toFixed(3)} €/L`);
 });
 
