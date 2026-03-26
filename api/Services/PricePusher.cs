@@ -6,6 +6,8 @@ using MawaqitDuGazole.Models;
 
 namespace MawaqitDuGazole.Services;
 
+file record SessionDto(Guid SessionId, string FuelType, double Latitude, double Longitude, int RadiusKm);
+
 /// <summary>
 /// Background service: every 10 minutes, re-queries the cheapest station
 /// for every active session and pushes updates through SignalR.
@@ -54,7 +56,7 @@ public class PricePusher : BackgroundService
             """;
 
         using var conn = _db.Open();
-        var sessions = (await conn.QueryAsync<dynamic>(sql)).ToList();
+        var sessions = (await conn.QueryAsync<SessionDto>(sql)).ToList();
 
         int pushed = 0;
         foreach (var s in sessions)
@@ -62,19 +64,16 @@ public class PricePusher : BackgroundService
             try
             {
                 var cheapest = await _stations.GetCheapestAsync(
-                    (double)s.Latitude, (double)s.Longitude,
-                    (string)s.FuelType, (int)s.RadiusKm);
+                    s.Latitude, s.Longitude, s.FuelType, s.RadiusKm);
 
                 if (cheapest is null) continue;
 
-                string groupName = ((Guid)s.SessionId).ToString();
-                await _hub.Clients.Group(groupName).SendAsync("PriceUpdate", cheapest);
+                await _hub.Clients.Group(s.SessionId.ToString()).SendAsync("PriceUpdate", cheapest);
                 pushed++;
             }
             catch (Exception ex)
             {
-                string sid = s.SessionId.ToString();
-                _logger.LogWarning("[pusher] failed session {id}: {err}", sid, ex.Message);
+                _logger.LogWarning("[pusher] failed session {id}: {err}", s.SessionId, ex.Message);
             }
         }
         _logger.LogInformation("[pusher] pushed to {n}/{total} sessions", pushed, sessions.Count);

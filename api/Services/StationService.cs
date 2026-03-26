@@ -25,11 +25,11 @@ public class StationService
                 gs.city          AS City,
                 gs.postal_code   AS PostalCode,
                 fp.fuel_type     AS FuelType,
-                fp.price         AS Price,
+                fp.price::float8 AS Price,
                 ROUND(
-                    ST_Distance(gs.location, ST_SetSRID(ST_MakePoint(@lng, @lat), 4326)::geography)
-                    / 1000.0, 2
-                )                AS DistanceKm
+                    (ST_Distance(gs.location, ST_SetSRID(ST_MakePoint(@lng, @lat), 4326)::geography)
+                    / 1000.0)::numeric, 2
+                )::float8        AS DistanceKm
             FROM fuel_prices fp
             JOIN gas_stations gs ON gs.id = fp.station_id
             WHERE
@@ -65,11 +65,11 @@ public class StationService
                 gs.city          AS City,
                 gs.postal_code   AS PostalCode,
                 fp.fuel_type     AS FuelType,
-                fp.price         AS Price,
+                fp.price::float8 AS Price,
                 ROUND(
-                    ST_Distance(gs.location, ST_SetSRID(ST_MakePoint(@lng, @lat), 4326)::geography)
-                    / 1000.0, 2
-                )                AS DistanceKm
+                    (ST_Distance(gs.location, ST_SetSRID(ST_MakePoint(@lng, @lat), 4326)::geography)
+                    / 1000.0)::numeric, 2
+                )::float8        AS DistanceKm
             FROM fuel_prices fp
             JOIN gas_stations gs ON gs.id = fp.station_id
             WHERE

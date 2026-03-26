@@ -67,3 +67,8 @@ desktop.ini
 *.swo
 .vscode/settings.json
 .vscode/launch.json
+
+# ----- All *.md except README.md -----
+!.gitignore
+*.md
+!README.md  

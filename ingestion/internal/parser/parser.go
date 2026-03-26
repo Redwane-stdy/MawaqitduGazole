@@ -5,6 +5,7 @@ package parser
 
 import (
 	"encoding/xml"
+	"fmt"
 	"io"
 	"strconv"
 	"strings"
@@ -62,10 +63,29 @@ var FuelTypeMap = map[string]string{
 	"GPLc":   "GPLc",
 }
 
+// iso8859Reader wraps an ISO-8859-1 / Latin-1 byte stream and re-encodes it
+// as UTF-8 on the fly (Latin-1 codepoints map 1:1 to Unicode).
+func iso8859Reader(charset string, input io.Reader) (io.Reader, error) {
+	if !strings.EqualFold(charset, "iso-8859-1") && !strings.EqualFold(charset, "latin-1") {
+		return nil, fmt.Errorf("unsupported charset: %s", charset)
+	}
+	raw, err := io.ReadAll(input)
+	if err != nil {
+		return nil, err
+	}
+	runes := make([]rune, len(raw))
+	for i, b := range raw {
+		runes[i] = rune(b)
+	}
+	return strings.NewReader(string(runes)), nil
+}
+
 // Parse decodes the XML stream returned by the government API.
 func Parse(r io.Reader) ([]ParsedStation, error) {
 	var list PDVList
-	if err := xml.NewDecoder(r).Decode(&list); err != nil {
+	dec := xml.NewDecoder(r)
+	dec.CharsetReader = iso8859Reader
+	if err := dec.Decode(&list); err != nil {
 		return nil, err
 	}
 

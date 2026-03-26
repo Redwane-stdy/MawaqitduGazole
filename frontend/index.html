@@ -7,14 +7,16 @@
   <link rel="stylesheet" href="style.css" />
 </head>
 <body>
+
   <!-- ═══════════════════════════════════════════════════
        SETUP SCREEN (shown on first visit)
   ══════════════════════════════════════════════════════ -->
-  <div id="setup-screen" class="screen">
-    <div class="logo">
-      <span class="logo-icon">⛽</span>
-      <h1>MawaqitduGazole</h1>
-      <p class="tagline">Le prix le moins cher, maintenant.</p>
+  <div id="setup-screen" class="screen setup-layout">
+
+    <div class="setup-brand">
+      <span class="setup-brand__icon">⛽</span>
+      <h1 class="setup-brand__name">MawaqitduGazole</h1>
+      <p class="setup-brand__tagline">Le prix le moins cher, maintenant.</p>
     </div>
 
     <form id="setup-form" class="setup-card">
@@ -36,6 +38,25 @@
           📍 Utiliser ma position GPS
         </button>
         <div id="geo-status" class="geo-status"></div>
+        <!-- Fallback : affiché si géolocalisation refusée ou non supportée -->
+        <div id="geo-fallback" class="geo-fallback hidden">
+          <div class="autocomplete-wrapper">
+            <div class="geo-fallback-row">
+              <input
+                type="text"
+                id="location-input"
+                class="location-input"
+                placeholder="Ville ou code postal (ex : Lyon, 69000…)"
+                autocomplete="off"
+              />
+              <button type="button" id="location-search-btn" class="location-search-btn">
+                Rechercher
+              </button>
+            </div>
+            <ul id="city-suggestions" class="city-suggestions hidden"></ul>
+          </div>
+          <div id="location-status" class="geo-status"></div>
+        </div>
       </div>
 
       <div class="field">
@@ -52,58 +73,108 @@
     </form>
   </div>
 
+
   <!-- ═══════════════════════════════════════════════════
-       WIDGET SCREEN (shown after setup)
+       WIDGET SCREEN (shown after setup) — dashboard
   ══════════════════════════════════════════════════════ -->
-  <div id="widget-screen" class="screen hidden">
-    <header class="widget-header">
-      <span class="logo-sm">⛽ MawaqitduGazole</span>
-      <button id="reset-btn" class="reset-btn" title="Changer mes préférences">✎</button>
-    </header>
+  <div id="widget-screen" class="screen hidden dashboard-layout">
 
-    <div class="widget-body">
-      <div id="loading-state" class="state">
-        <div class="spinner"></div>
-        <p>Recherche en cours…</p>
+    <aside class="sidebar">
+      <div class="sidebar__brand">
+        <span class="sidebar__brand-icon">⛽</span>
+        <span class="sidebar__brand-name">MawaqitduGazole</span>
       </div>
 
-      <div id="result-state" class="state hidden">
-        <div class="price-badge">
-          <span id="price-value" class="price-value">—</span>
-          <span class="price-unit">€/L</span>
+      <div class="sidebar__hero">
+        <div id="loading-state" class="state">
+          <div class="spinner"></div>
+          <p class="spinner-label">Recherche…</p>
         </div>
-        <div class="station-info">
-          <p id="station-name" class="station-name"></p>
-          <p id="station-dist" class="station-dist"></p>
-        </div>
-        <div class="fuel-tag-row">
+
+        <div id="result-state" class="state hidden">
+          <div class="price-badge">
+            <span id="price-value" class="price-value">—</span>
+            <span class="price-unit">€/L</span>
+          </div>
           <span id="fuel-tag" class="fuel-tag"></span>
+          <div class="station-info">
+            <p id="station-name" class="station-name"></p>
+            <p id="station-dist" class="station-dist"></p>
+          </div>
+          <button id="maps-btn" class="maps-btn">🗺 Y aller →</button>
+        </div>
+
+        <div id="no-result-state" class="state hidden">
+          <p class="no-result">Aucune station dans ce rayon.</p>
+          <button id="expand-btn" class="expand-btn">Agrandir le rayon</button>
         </div>
       </div>
 
-      <div id="no-result-state" class="state hidden">
-        <p class="no-result">Aucune station trouvée dans ce rayon.</p>
-        <button id="expand-btn" class="expand-btn">Agrandir le rayon</button>
+      <div class="sidebar__divider"></div>
+
+      <div class="sidebar__meta">
+        <div class="meta-row">
+          <span class="meta-icon">🕐</span>
+          <span id="last-update" class="last-update">Mise à jour…</span>
+        </div>
+        <div class="meta-row">
+          <span class="meta-icon">📍</span>
+          <span id="db-count" class="db-count">—</span>
+        </div>
+      </div>
+
+      <button id="reset-btn" class="reset-btn">
+        ✎ Modifier mes préférences
+      </button>
+    </aside>
+
+    <main class="main-area">
+      <div class="topbar">
+        <h2 class="topbar__title">Les stations les moins chères</h2>
+        <span class="topbar__badge" id="topbar-fuel-badge"></span>
+      </div>
+
+      <div class="top5-panel">
+        <table id="top5-table">
+          <thead>
+            <tr>
+              <th>#</th>
+              <th>Station</th>
+              <th>Distance</th>
+              <th>Prix</th>
+            </tr>
+          </thead>
+          <tbody id="top5-body"></tbody>
+        </table>
+      </div>
+
+    </main>
+  </div>
+
+  <!-- ═══════════════════════════════════════════════════
+       LOG PANEL (overlay, toggleable)
+  ══════════════════════════════════════════════════════ -->
+  <div id="log-panel" class="log-panel hidden">
+    <div class="log-panel__header">
+      <div class="log-tabs">
+        <button class="log-tab active" data-tab="api">API (.NET)</button>
+        <button class="log-tab" data-tab="ingestion">Ingestion (Go)</button>
+      </div>
+      <div class="log-panel__actions">
+        <button id="log-clear-btn" class="log-action-btn" title="Effacer">✕ Effacer</button>
+        <button id="log-close-btn" class="log-action-btn log-close" title="Fermer">✕</button>
       </div>
     </div>
-
-    <footer class="widget-footer">
-      <span id="last-update" class="last-update">Mise à jour…</span>
-      <span class="dot">·</span>
-      <span id="db-count" class="db-count"></span>
-    </footer>
-
-    <!-- Top 5 panel -->
-    <div class="top5-panel">
-      <h3>5 stations les moins chères</h3>
-      <table id="top5-table">
-        <thead>
-          <tr><th>Station</th><th>Distance</th><th>Prix</th></tr>
-        </thead>
-        <tbody id="top5-body"></tbody>
-      </table>
+    <div class="log-body">
+      <div id="log-pane-api"       class="log-pane active"></div>
+      <div id="log-pane-ingestion" class="log-pane hidden"></div>
     </div>
   </div>
+
+  <!-- Log toggle button (always visible in dashboard) -->
+  <button id="log-toggle-btn" class="log-toggle-btn hidden" title="Afficher / masquer les logs">
+    📋 Logs
+  </button>
 
   <script src="https://cdnjs.cloudflare.com/ajax/libs/microsoft-signalr/8.0.0/signalr.min.js"
           integrity="sha512-3zf8MdEZUh+yP0BuXAhN6U7ZrmG5OuKqd3ME6rWPd1TqGJfQcSFCFN+AqnfZsFVvsb4j4b+FOPJ6HEOxBGkQ=="
